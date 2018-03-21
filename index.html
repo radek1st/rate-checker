@@ -1,0 +1,42 @@
+<html>
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+	<script type="text/javascript" src="js/script.js"></script>
+
+	<script>
+
+function httpGet(theUrl)
+{
+    var httpReq = new XMLHttpRequest();
+    
+
+httpReq.open( "GET", theUrl, false ); // false for synchronous request
+    httpReq.setRequestHeader('Access-Control-Allow-Method', 'GET');
+    httpReq.setRequestHeader('Access-Control-Allow-Headers', 'Accept');
+    httpReq.setRequestHeader('Access-Control-Allow-Origin', 'http://127.0.0.1');
+
+    httpReq.send( null );
+
+    console.log(httpReq);
+    
+// $.getJSON(theUrl, function(jsonp) {
+//     alert(jsonp.last_price_24h);
+// });
+
+
+    document.getElementById("demo").innerHTML = httpReq.responseText;
+
+    return httpReq.responseText;
+}
+	</script>
+</head>
+
+<body>
+	<p id="demo">A Paragraph.</p>
+
+	<button type="button" onclick="httpGet('https://api.qryptos.com/products/97')">Try it</button>
+
+</body>
+
+</html>
