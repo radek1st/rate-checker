@@ -1,9 +1,6 @@
 <html>
 <head>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-
-	<script type="text/javascript" src="js/script.js"></script>
-
 	<script>
 
 function httpGet(theUrl)
@@ -13,8 +10,9 @@ function httpGet(theUrl)
 
 httpReq.open( "GET", theUrl, false ); // false for synchronous request
     httpReq.setRequestHeader('Access-Control-Allow-Method', 'GET');
-    httpReq.setRequestHeader('Access-Control-Allow-Headers', 'Accept');
+    httpReq.setRequestHeader('Access-Control-Allow-Headers', 'Origin, Accept');
     httpReq.setRequestHeader('Access-Control-Allow-Origin', 'https://radek1st.github.io');
+	httpReq.setRequestHeader('Accept', 'application/json');
 
     httpReq.send( null );
 
