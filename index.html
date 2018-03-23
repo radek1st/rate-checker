@@ -12,7 +12,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js" integrity="sha256-ssw743RfM8cbNhwou26tmmPhiNhq3buUbRG/RevtfG4=" crossorigin="anonymous"></script>
 
-	<script>
+    <script>
         async function httpGet(theUrl){
             const proxyurl = "https://cors-anywhere.herokuapp.com/";
             const url = theUrl; // site that doesn’t send Access-Control-*
@@ -71,26 +71,18 @@
             $("#rate-checker #audPart").val(60);
             $("#rate-checker #ethPart").val(30);
             $("#rate-checker #gzePart").val(10);
+
+            $("#ex16b").slider({ min: 0, max: 100, value: [60, 90],
+                formatter: function(value) {
+                    if(value.length == 2){
+                        console.log(value);
+                        $("#rate-checker #audPart").val(value[0]);
+                        $("#rate-checker #ethPart").val(value[1] - value[0]);
+                        $("#rate-checker #gzePart").val(100 - value[1]);
+                    }
+                }
+             });
         };
-
-        // $('#ex1').slider({
-        //     formatter: function(value) {
-        //         return 'Current value: ' + value;
-        //     }
-        // });
-
-        // $("#ex16b").slider({ min: 0, max: 10, value: [0, 10], focus: true });
-
-
-        //http://seiyria.com/bootstrap-slider/
-        //can get value1 (aud)
-        //and value 2 (eth)
-        //and value 3 = 100 - value1 - value2
-        // var slider = new Slider('#ex1', {
-        //     formatter: function(value) {
-        //         return 'Current value: ' + value;
-        //     }
-        // });
 
         function calculate(){
             getDate();
@@ -104,7 +96,7 @@
 
     <div class="container" role="main">
 
-	<h1>Simple rate fetching script for GZE.</h1>
+    <h1>Simple rate fetching script for GZE.</h1>
 
 <!-- <div class="container border border-primary"> -->
           
@@ -121,16 +113,22 @@
                         </div>
                     </div>
                     <div class="row form-group">
+                        <div class="col-sm-12">
+                            <label for="ex16b">Adjust proportions (%):</label>
+                            <input id="ex16b" type="text">
+                        </div>
+                    </div>
+                    <div class="row form-group">
                         <div class="col-sm-2">
-                            <label for="audPart">AUD proportions (%):</label>
-                            <input id="audPart" type="text" class="form-control" placeholder="AUD part: e.g. 60%">
+                            <label for="audPart">AUD (%):</label>
+                            <input id="audPart" type="text" class="form-control" disabled placeholder="AUD part: e.g. 60%">
                         </div>
                         <div class="col-sm-2">
-                            <label for="ethPart">ETH proportions (%):</label>
-                            <input id="ethPart" type="text" class="form-control" placeholder="ETH part: e.g. 30%">
+                            <label for="ethPart">ETH (%):</label>
+                            <input id="ethPart" type="text" class="form-control" disabled placeholder="ETH part: e.g. 30%">
                         </div>
                         <div class="col-sm-2">
-                            <label for="gzePart">GZE proportions (%):</label>
+                            <label for="gzePart">GZE (%):</label>
                             <input id="gzePart" type="text" class="form-control" disabled placeholder="GZE part: e.g. 10%">
                         </div>
                     </div>
