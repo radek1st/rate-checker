@@ -21,11 +21,44 @@
             return JSON.parse(x);
         }
 
-        async function calculateRate(){  
-            const [gzeEth, ethAud] = await Promise.all([
-                httpGet('https://api.qryptos.com/products/97'), 
-                httpGet('https://api.independentreserve.com/Public/GetMarketSummary?primaryCurrencyCode=eth&secondaryCurrencyCode=aud')
-            ]);
+        async function getAverageEtherPrice(days){
+            const currentDate = new Date(); 
+            const timeNow = Math.round(currentDate.getTime() / 1000);
+            const dayInSec = 60*60*24;
+            var promises = [];
+            for (var i = 0; i < days; i++) {
+                const ts = timeNow - i*dayInSec;
+                // const request = "https://min-api.cryptocompare.com/data/pricehistorical?fsym=ETH&tsyms=AUD&ts=" + ts;
+                const request = 
+                    "https://min-api.cryptocompare.com/data/dayAvg?fsym=ETH&tsym=AUD&avgType=MidHighLow&toTs=" + ts;
+                promises.push(httpGet(request));
+            }
+            
+            var res = await Promise.all(promises);
+            console.log(res);
+            
+            var sum = 0;
+            for (var i = 0; i < days; i++) {
+                //sum += res[i]["ETH"]["AUD"];
+                sum += res[i]["AUD"];
+            }
+            console.log("Average ETH over the past " + days + " days is " + sum/days + " AUD");
+            return sum/days;
+        }
+
+        async function getAverageGzePrice(){
+            const promises = [];
+            promises.push(httpGet('https://api.qryptos.com/products/97'));
+            var res = await Promise.all(promises);
+            console.log("res", res);
+            return (res[0]["market_ask"] + res[0]["market_bid"])/2;
+        }
+
+        async function calculateRate(){ 
+            const gzePromise = getAverageGzePrice();
+            const ethPromise = getAverageEtherPrice(14);
+
+            const [gzeEth, ethAud] = await Promise.all([gzePromise, ethPromise]);
 
             const totalPayInAud = $("#rate-checker #payInAud").val();
             console.log(totalPayInAud);
@@ -35,7 +68,7 @@
             const gzePart = 100 - audPart - ethPart;
             $("#rate-checker #gzePart").val(gzePart);
 
-            console.log(audPart, ethPart, gzePart);
+            console.log("parts", audPart, ethPart, gzePart);
 
             const payAud = totalPayInAud*audPart/100;
             const payEth = totalPayInAud*ethPart/100;
@@ -44,13 +77,13 @@
             $("#results #payEth").val(payEth);
             $("#results #payGze").val(payGze);
 
-            const rate = ethAud.DayAvgPrice * gzeEth.last_price_24h;
-            $("#results #gzeEth").val(gzeEth.last_price_24h);
-            $("#results #ethAud").val(ethAud.DayAvgPrice);
+            const rate = ethAud * gzeEth;
+            $("#results #gzeEth").val(gzeEth);
+            $("#results #ethAud").val(ethAud);
             $("#results #gzeAud").val(rate);
 
             $("#results #calcAud").val(payAud);
-            $("#results #calcEth").val(Math.ceil(payEth/ethAud.DayAvgPrice * 1000) / 1000);
+            $("#results #calcEth").val(Math.ceil(payEth/ethAud * 1000) / 1000);
             $("#results #calcGze").val(Math.ceil(payGze/rate));
         };
 
@@ -201,13 +234,13 @@ Note that the slider handle that caused the value change is focused.
                             <div class="panel-body">
                                 <div class="row">
                                     <div class="col col-sm-12">
-                                        <label for="gzeEth">GZE to ETH (Qryptos):</label>
+                                        <label for="gzeEth">GZE to ETH (Qryptos - avg(market_ask, market_bid)) :</label>
                                         <input id="gzeEth" type="text" class="form-control" disabled>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col col-sm-12">
-                                        <label for="ethAud">ETH to AUD (IndependentReserves):</label>
+                                        <label for="ethAud">ETH to AUD (cryptocompare.com - avg(14 days)):</label>
                                         <input id="ethAud" type="text" class="form-control" disabled>
                                     </div>
                                 </div>
